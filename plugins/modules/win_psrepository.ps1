@@ -20,6 +20,7 @@ $source_location = Get-AnsibleParam -obj $params -name "source_location" -aliase
 $script_source_location = Get-AnsibleParam -obj $params -name "script_source_location" -type "str"
 $publish_location = Get-AnsibleParam -obj $params -name "publish_location" -type "str"
 $script_publish_location = Get-AnsibleParam -obj $params -name "script_publish_location" -type "str"
+$proxy =  Get-AnsibleParam -obj $params -name "installation_policy" -type "str"
 $state = Get-AnsibleParam -obj $params -name "state" -type "str" -default "present" -validateset "present", "absent"
 $installation_policy = Get-AnsibleParam -obj $params -name "installation_policy" -type "str" -validateset "trusted", "untrusted"
 $force = Get-AnsibleParam -obj $params -name "force" -type "bool" -default $false
@@ -67,7 +68,7 @@ function Resolve-LocationParameter {
     }
 }
 
-Resolve-LocationParameter -Name source_location,publish_location,script_source_location,script_publish_location -Splatter $repository_params
+Resolve-LocationParameter -Name source_location,publish_location,script_source_location,script_publish_location,proxy -Splatter $repository_params
 
 if (-not $repository_params.SourceLocation -and $state -eq 'present' -and ($force -or -not $Repo)) {
     Fail-Json -obj $result -message "'source_location' is required when registering a new repository or using force with 'state' == 'present'."
@@ -102,6 +103,12 @@ if ($Repo) {
     if ($force -or $repository_params.ScriptSourceLocation) {
         if ($repository_params.ScriptSourceLocation -ne $Repo.ScriptSourceLocation) {
             $changed_properties.ScriptSourceLocation = $repository_params.ScriptSourceLocation
+        }
+    }
+    
+    if ($force -or $repository_params.proxy) {
+        if ($repository_params.Proxy -ne $Repo.Proxy) {
+            $changed_properties.Proxy = $repository_params.Proxy
         }
     }
 
