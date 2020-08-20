@@ -232,6 +232,13 @@ Examples
         name: MyRepository
         installation_policy: untrusted
 
+    - name: Register a PowerShell repository
+      community.windows.win_psrepository:
+        name: MyRepository
+        source_location: https://myrepo.com
+        proxy: https://myproxy:port
+        state: present
+        
     - name: Add a repository with different locations
       community.windows.win_psrepository:
         name: NewRepo
